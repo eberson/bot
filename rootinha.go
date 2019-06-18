@@ -78,6 +78,11 @@ func (r *Rootinha) Start() error {
 	rtm := api.NewRTM()
 	go rtm.ManageConnection()
 
+	dms, err := loadDirectMessages(api)
+	if err != nil {
+		return err
+	}
+
 	cli, err := github.New(r.Config.GitHub.APIURL, r.Config.GitHub.Token)
 	if err != nil {
 		return err
@@ -88,8 +93,18 @@ func (r *Rootinha) Start() error {
 		case msg := <-rtm.IncomingEvents:
 			switch ev := msg.Data.(type) {
 			case *slack.MessageEvent:
+				var (
+					ok      bool
+					mention string
+					text    string
+				)
 
-				ok, mention, text := findByMention(ev.Text, r.Config.Slack.User)
+				if dms.IsDMToBot(ev.Channel) {
+					ok = true
+					text = ev.Text
+				} else {
+					ok, mention, text = findByMention(ev.Text, r.Config.Slack.User)
+				}
 
 				logrus.Info("found mention: ", ok)
 				logrus.Info("user: ", mention)
