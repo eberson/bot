@@ -20,8 +20,9 @@ type BotConfig struct {
 }
 
 type Slack struct {
-	Token string
-	User  string
+	Token  string
+	User   string
+	UserID string
 }
 
 type GitHub struct {
@@ -75,6 +76,11 @@ func New() *Rootinha {
 func (r *Rootinha) Start() error {
 
 	api := slack.New(r.Config.Slack.Token)
+
+	if err := r.Config.Slack.loadBotUserID(api); err != nil {
+		return err
+	}
+
 	rtm := api.NewRTM()
 	go rtm.ManageConnection()
 
@@ -89,7 +95,7 @@ func (r *Rootinha) Start() error {
 			switch ev := msg.Data.(type) {
 			case *slack.MessageEvent:
 
-				ok, mention, text := findByMention(ev.Text, r.Config.Slack.User)
+				ok, mention, text := findByMention(ev.Text, r.Config.Slack.UserID)
 
 				logrus.Info("found mention: ", ok)
 				logrus.Info("user: ", mention)
