@@ -17,7 +17,7 @@ type Event interface {
 
 type MessageEvent struct {
 	Event    Event
-	Params   map[string]string
+	Params   map[string]interface{}
 	Value    string
 	Template string
 	To       string
@@ -27,7 +27,7 @@ func (e *MessageEvent) Text() string {
 	params := e.Params
 
 	if params == nil {
-		params = make(map[string]string)
+		params = make(map[string]interface{})
 	}
 
 	params["To"] = e.To
@@ -41,7 +41,7 @@ func (e *MessageEvent) Text() string {
 	return text
 }
 
-func makeMessageText(tmpl string, params map[string]string) (string, error) {
+func makeMessageText(tmpl string, params map[string]interface{}) (string, error) {
 	tmp, err := template.New("tmpl").Parse(tmpl)
 	if err != nil {
 		logrus.WithFields(logrus.Fields{
