@@ -9,7 +9,7 @@ type Messenger interface {
 }
 
 type ConfigurableAction interface {
-	Fill(parameters Parameters) error
+	Fill(intent Intent, parameters Parameters) error
 }
 
 type Action interface {
@@ -18,6 +18,26 @@ type Action interface {
 }
 
 type Actions map[string]Action
+
+func (a *Actions) Actions() Actions {
+	result := make(Actions)
+
+	for name, action := range *a {
+		result[name] = action
+	}
+
+	return result
+}
+
+func (a *Actions) ActionByName(name string) Action {
+	action, exists := (*a)[name]
+
+	if !exists {
+		return nil
+	}
+
+	return action
+}
 
 func (a *Actions) Add(actions ...Action) {
 	for _, action := range actions {
