@@ -22,7 +22,7 @@ func (t *timeAction) Run(intent chat.Intent, messenger chat.Messenger, event eve
 	return messenger.Send(events.MessageEvent{
 		Event:    event,
 		Template: intent.Response.Template,
-		Params: map[string]string{
+		Params: map[string]interface{}{
 			"Time": time.Now().Format(time.RFC3339),
 		},
 		To: event.From(),

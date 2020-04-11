@@ -15,17 +15,11 @@ func (p *plugin) Name() string {
 }
 
 func (p *plugin) Actions() chat.Actions {
-	result := make(chat.Actions)
-
-	for name, action := range p.actions {
-		result[name] = action
-	}
-
-	return result
+	return p.actions.Actions()
 }
 
 func (p *plugin) ActionByName(name string) chat.Action {
-	return p.actions[name]
+	return p.actions.ActionByName(name)
 }
 
 func New(config chat.Config) chat.Plugin {
