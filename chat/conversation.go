@@ -39,11 +39,11 @@ func (c *Conversation) Execute(event events.Event) error {
 
 	params := intent.Parameters(event.Text())
 
-	messenger, err := c.context.Messenger(intent.Messenger)
+	messenger, err := c.context.Messenger(intent.Response.Messenger)
 
 	if err != nil {
 		logrus.WithFields(logrus.Fields{
-			"messenger": intent.Messenger,
+			"messenger": intent.Response.Messenger,
 			"error":     err,
 		}).Error(err)
 
@@ -51,7 +51,7 @@ func (c *Conversation) Execute(event events.Event) error {
 	}
 
 	if configurable, ok := action.(ConfigurableAction); ok {
-		if err = configurable.Fill(params); err != nil {
+		if err = configurable.Fill(*intent, params); err != nil {
 			return c.handleError(messenger, event, err)
 		}
 	}

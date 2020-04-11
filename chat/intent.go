@@ -2,6 +2,7 @@ package chat
 
 import (
 	"regexp"
+	"strings"
 
 	"github.com/pkg/errors"
 )
@@ -17,6 +18,26 @@ func (it *Intent) Validate() error {
 		}
 
 		it.regex[i] = r
+	}
+
+	config := CurrentConfig()
+
+	for _, ne := range it.NamedEntities {
+		found := false
+
+		for _, entity := range config.Entities {
+			if strings.EqualFold(entity.Name, ne) {
+				it.Entities = append(it.Entities, entity)
+				found = true
+			}
+		}
+
+		if !found {
+			return errors.Wrap(
+				errors.New("it was impossible to find named entity. Did you set it?"),
+				ne,
+			)
+		}
 	}
 
 	return nil

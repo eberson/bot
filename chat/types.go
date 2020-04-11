@@ -38,11 +38,11 @@ type Intent struct {
 	NamedEntities []string
 	Action        string
 	Response      *Response
-	Messenger     string
 }
 
 type Response struct {
-	Template string
+	Template  string
+	Messenger string
 }
 
 type ConversationState struct {
