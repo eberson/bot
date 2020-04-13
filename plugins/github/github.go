@@ -40,6 +40,8 @@ func New(config chat.Config) (chat.Plugin, error) {
 	actions := make(chat.Actions)
 	actions.Add(
 		newPullRequestsByState(gh),
+		newPullRequestsToReview(gh),
+		newPullRequestsToMerge(gh),
 	)
 
 	return &githubPlugin{
