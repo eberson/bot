@@ -56,6 +56,10 @@ func (c *Conversation) Execute(event events.Event) error {
 		}
 	}
 
+	if err = messenger.StartTyping(event); err != nil {
+		return c.handleError(messenger, event, err)
+	}
+
 	if err = action.Run(*intent, messenger, event); err != nil {
 		return c.handleError(messenger, event, err)
 	}
