@@ -18,7 +18,7 @@ type input struct {
 }
 
 func (i *input) Name() string {
-	return "console input"
+	return "input"
 }
 
 func (i *input) Start() chan events.Event {
