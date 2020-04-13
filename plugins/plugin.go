@@ -3,6 +3,8 @@ package plugins
 import (
 	"errors"
 
+	"github.com/eberson/rootinha/plugins/slack"
+
 	"github.com/eberson/rootinha/plugins/console"
 
 	"github.com/sirupsen/logrus"
@@ -26,6 +28,8 @@ func NewContext(config chat.Config) (chat.Context, error) {
 			opts = append(opts, console.Build(config))
 		case github.PluginName:
 			opts = append(opts, github.Build(config))
+		case slack.PluginName:
+			opts = append(opts, slack.Build(config))
 		}
 	}
 
