@@ -3,6 +3,8 @@ package chat
 import (
 	"sync"
 
+	"github.com/eberson/rootinha/events"
+
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )
@@ -73,11 +75,13 @@ func (r *Rootinha) prepareListener() func(Input) error {
 					return nil
 				}
 
-				err := NewConversation(r.context, config.Intents...).Execute(event)
+				go func(context Context, event events.Event, intents ...Intent) {
+					err := NewConversation(context, intents...).Execute(event)
 
-				if err != nil {
-					logrus.WithError(err).Error("error executing conversation")
-				}
+					if err != nil {
+						logrus.WithError(err).Error("error executing conversation")
+					}
+				}(r.context, event, config.Intents...)
 			default:
 				continue
 			}
