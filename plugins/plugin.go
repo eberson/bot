@@ -3,6 +3,8 @@ package plugins
 import (
 	"errors"
 
+	"github.com/eberson/rootinha/plugins/aws"
+
 	"github.com/eberson/rootinha/plugins/slack"
 
 	"github.com/eberson/rootinha/plugins/console"
@@ -20,6 +22,24 @@ type DefaultContext struct {
 }
 
 func NewContext(config chat.Config) (chat.Context, error) {
+	context := &DefaultContext{
+		inputs:     make(map[string]chat.Input),
+		plugins:    make(map[string]chat.Plugin),
+		messengers: make(map[string]chat.Messenger),
+	}
+
+	opts := registerPlugins(config)
+
+	for _, opt := range opts {
+		if err := opt(context); err != nil {
+			return nil, err
+		}
+	}
+
+	return context, nil
+}
+
+func registerPlugins(config chat.Config) []chat.OptionFunc {
 	var opts []chat.OptionFunc
 
 	for name := range config.Plugins {
@@ -30,22 +50,12 @@ func NewContext(config chat.Config) (chat.Context, error) {
 			opts = append(opts, github.Build(config))
 		case slack.PluginName:
 			opts = append(opts, slack.Build(config))
+		case aws.PluginName:
+			opts = append(opts, aws.Build(config))
 		}
 	}
 
-	context := &DefaultContext{
-		inputs:     make(map[string]chat.Input),
-		plugins:    make(map[string]chat.Plugin),
-		messengers: make(map[string]chat.Messenger),
-	}
-
-	for _, opt := range opts {
-		if err := opt(context); err != nil {
-			return nil, err
-		}
-	}
-
-	return context, nil
+	return opts
 }
 
 func (c *DefaultContext) RegisterInput(input chat.Input) {
